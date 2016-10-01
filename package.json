@@ -6,7 +6,17 @@
     "start": "node node_modules/react-native/local-cli/cli.js start"
   },
   "dependencies": {
+    "lodash": "^4.15.0",
     "react": "15.3.1",
-    "react-native": "0.33.0"
+    "react-native": "0.33.0",
+    "react-native-animatable": "^0.6.1",
+    "react-native-sound": "^0.8.3",
+    "react-redux": "^4.4.5",
+    "recompose": "^0.20.2",
+    "redux": "^3.6.0",
+    "redux-actions": "^0.12.0",
+    "redux-promise": "^0.5.3",
+    "redux-thunk": "^2.1.0",
+    "reselect": "^2.5.3"
   }
 }
