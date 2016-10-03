@@ -1,6 +1,6 @@
 /* @flow */
 import React from 'react';
-import { View } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 
 import globalStyles from '../../style';
 import styles from './style';
@@ -12,14 +12,15 @@ type Props = {
 }
 
 const TopBar: Function = ({ onBackPress, children, customStyle }: Props): React.Element<any> => (
-  <View
+  <LinearGradient
+    colors={['#065187', '#1f9af2']}
     style={[
       globalStyles.flex,
       styles.topbar,
     ]}
   >
     { children }
-  </View>
+  </LinearGradient>
 );
 
 export default TopBar;

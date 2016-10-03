@@ -16,8 +16,13 @@ export default StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 3,
+    borderWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.2)',
+    borderRightColor: 'rgba(255, 255, 255, 0.2)',
+    borderLeftColor: 'rgba(255, 255, 255, 0.8)',
+    borderTopColor: 'rgba(255, 255, 255, 0.8)',
+    marginHorizontal: 4,
+    marginVertical: 3,
   },
-  selectedField: {
-    borderColor: 'yellow',
-  }
 });

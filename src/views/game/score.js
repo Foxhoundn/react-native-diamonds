@@ -7,14 +7,13 @@ import Text from '../../components/text';
 import globalStyles from '../../style';
 
 type Props = {
-  saveTime: Function,
-  time: number,
+  score: number,
 }
 
-const MovesCounter: Function = ({ moves }: Props): React.Element<any> => (
+const Score: Function = ({ score }: Props): React.Element<any> => (
   <Section customStyle={globalStyles.flexCenter}>
-    <Text> Moves: { moves } </Text>
+    <Text> Score: { score } </Text>
   </Section>
 );
 
-export default pure(MovesCounter);
+export default pure(Score);

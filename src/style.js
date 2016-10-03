@@ -15,11 +15,27 @@ export default StyleSheet.create({
     justifyContent: 'center',
     paddingLeft: 20,
   },
+  topbarRightElement: {
+    flex: 1,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    paddingRight: 20,
+  },
+  topbarTitle: {
+    flex: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  topbarTitleText: {
+    fontSize: 28,
+  },
   menuButton: {
     marginBottom: 25,
   },
   menuButtonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 23,
+  },
+  fade: {
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
   }
 });

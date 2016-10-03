@@ -5,9 +5,7 @@ const ACTIONS = {
   GAME_TRYMOVE: 'GAME_TRYMOVE',
   GAME_PROCESSBLANKS: 'GAME_FILLBLANKS',
   GAME_OVER: 'GAME_OVER',
-  GAME_SAVE: 'GAME_SAVE',
   GAME_LOADING: 'GAME_SAVING',
-  GAME_SAVETIME: 'GAME_SAVETIME',
   GAME_TOGGLEMENU: 'GAME_TOGGLEMENU',
 };
 
@@ -20,7 +18,7 @@ const COLOURS = [
   'orange',
 ];
 
-const gameDefaults = {
+const DEFAULTS = {
   score: 0,
   moves: 3,
 };
@@ -28,5 +26,5 @@ const gameDefaults = {
 export {
   ACTIONS,
   COLOURS,
-  gameDefaults,
+  DEFAULTS,
 }

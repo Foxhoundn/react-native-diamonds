@@ -3,11 +3,12 @@ import React, { Component } from 'react';
 import {
   TouchableWithoutFeedback,
   View,
-  Image,
   Animated,
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 
 import styles from './style';
+import globalStyles from '../../style';
 
 type Props = {
   active: boolean,
@@ -30,7 +31,7 @@ class Field extends Component {
         this.state.opacity,
         {
           toValue: 0,
-          duration: 250,
+          duration: 350,
         }
       ).start();
     } else {
@@ -49,37 +50,46 @@ class Field extends Component {
 
     return (
       <TouchableWithoutFeedback onPress={onPress}>
-        <Animated.View
+        <View
           style={[
             styles.field,
-            active ? styles.selectedField : {},
-            {
-              opacity: this.state.opacity,
-              transform: [
-                {
-                  scale: this.state.opacity.interpolate({
-                    inputRange: [0, 0.8, 1],
-                    outputRange: [0.4, 1.4, 1],
-                  }),
-                },
-                {
-                  rotateZ: this.state.opacity.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: ['180deg', '0deg'],
-                  }),
-                }
-              ]
-            }
           ]}
         >
-          <Image
+          <LinearGradient
+            colors={['transparent', 'rgba(140, 140, 140, 0.3)']}
             style={[
-              styles.fieldImage,
-              active ? styles.fieldImageSelected : {}
+              globalStyles.flexCenter,
+              {
+                alignSelf: 'stretch',
+              }
             ]}
-            source={{ uri: field.color }}
-          />
-        </Animated.View>
+          >
+            <Animated.Image
+              style={[
+                styles.fieldImage,
+                active ? styles.fieldImageSelected : {},
+                {
+                  opacity: this.state.opacity,
+                  transform: [
+                    {
+                      scale: this.state.opacity.interpolate({
+                        inputRange: [0, 0.9, 1],
+                        outputRange: [0.3, 1.6, 1],
+                      }),
+                    },
+                    {
+                      rotateZ: this.state.opacity.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: ['180deg', '0deg'],
+                      }),
+                    },
+                  ],
+                },
+              ]}
+              source={{ uri: field.color }}
+            />
+          </LinearGradient>
+        </View>
       </TouchableWithoutFeedback>
     )
   }

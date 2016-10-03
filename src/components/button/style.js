@@ -6,29 +6,34 @@ const { width } = Dimensions.get('window');
 export default StyleSheet.create({
   buttonWrapper: {
     flex: 1,
+    borderWidth: 2,
+    borderRadius: 5,
+    borderColor: '#ede661',
+    height: 55,
+    width: width - (width / 10),
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  iconWrapper: {
+    width: 30,
+    height: 30,
+    borderRadius: 5,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  gradient: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 2,
-    backgroundColor: '#9859D4',
-    borderBottomWidth: 3,
-    borderBottomColor: '#612796',
-    height: 40,
-    width: width - (width / 10),
+    alignSelf: 'stretch',
+    borderWidth: 3,
+    borderColor: '#5e0977',
   },
-  buttonText: {
-    fontSize: 18,
-    color: '#fff',
-    textAlign: 'center',
-    textShadowColor: '#612796',
-    textShadowOffset: {
-      width: -1,
-      height: -1,
-    },
-    textShadowRadius: 1,
+  disabledGradient: {
+    borderColor: '#696969',
   },
   buttonDisabled: {
-    backgroundColor: '#a9a9a9',
-    borderBottomWidth: 3,
-    borderBottomColor: '#696969',
-  },
+    borderWidth: 2,
+    borderColor: '#a9a9a9',
+  }
 });

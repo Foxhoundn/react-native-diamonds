@@ -1,6 +1,9 @@
 package com.diamonds;
 
 import com.facebook.react.ReactActivity;
+import com.oblador.vectoricons.VectorIconsPackage;
+import com.zmxv.RNSound.RNSoundPackage;
+import com.BV.LinearGradient.LinearGradientPackage;
 
 public class MainActivity extends ReactActivity {
 

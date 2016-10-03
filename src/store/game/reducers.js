@@ -13,20 +13,23 @@ const initialState: Object = {
   update: true,
   loading: false,
   menu: false,
+  score: 0,
+  moves: 1,
+  stats: {
+    highscore: 0,
+    gamesPlayed: 0,
+  },
 };
 
 export default handleActions({
-  [ACTIONS.GAME_STARTGAME]: (state: Object, { payload: { board, score, moves }}) => {
-    return { ...initialState, ...{ board, score, moves } };
-  },
-  [ACTIONS.GAME_SAVE]: (state: Object) => {
-    return {
-      ...initialState,
-      ...{
-        save: state,
-      }
-    };
-  },
+  [ACTIONS.GAME_STARTGAME]: (state: Object, { payload: { board, score, moves, stats } }) => (
+    { ...initialState, ...{
+      board,
+      score: score || initialState.score,
+      moves: moves || initialState.moves,
+      stats: stats || initialState.stats,
+    }}
+  ),
   [ACTIONS.GAME_LOADING]: (state: Object) => {
     return {
       ...state,
@@ -72,7 +75,7 @@ export default handleActions({
   [ACTIONS.GAME_TOGGLEMENU]: (state: Object) => (
     { ...state, ...{ menu: !state.menu } }
   ),
-  [ACTIONS.GAME_OVER]: (state: Object) => (
-    { ...state, ...{ processing: true, over: true } }
+  [ACTIONS.GAME_OVER]: (state: Object, { payload: { stats } }) => (
+    { ...state, ...{ processing: true, over: true, stats } }
   ),
 }, initialState);

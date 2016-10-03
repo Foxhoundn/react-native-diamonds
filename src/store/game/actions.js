@@ -2,7 +2,7 @@
 import { createAction } from 'redux-actions';
 import { AsyncStorage } from 'react-native';
 
-import { ACTIONS, gameDefaults } from '../../constants/game';
+import { ACTIONS } from '../../constants/game';
 import removeHits from '../../helpers/game/removeHits';
 import checkForHits from '../../helpers/game/checkForHits';
 import calculateScore from '../../helpers/game/calculateScore';
@@ -15,50 +15,16 @@ import * as app from '../app/actions';
 
 const startGameAction: Function = createAction(
   ACTIONS.GAME_STARTGAME,
-  async (resume: boolean): Object => {
+  async (resume: boolean, state: Object): Object => {
+    const stats = JSON.parse(await AsyncStorage.getItem('stats'));
+
     if (resume) {
-      const { board, score, moves } = JSON.parse(await AsyncStorage.getItem('save'));
-
-      return { board, score, moves }
+      return { ...state().app.save, ...{ stats } };
     }
-
-    await AsyncStorage.removeItem('save');
 
     return {
       board: createBoard(),
-      score: gameDefaults.score,
-      moves: gameDefaults.moves,
-    }
-  }
-);
-
-const saveGameAction: Function = createAction(
-  ACTIONS.GAME_SAVE,
-  async (
-    board: Array<Array<string>>,
-    moves: number,
-    score: number,
-    dispatch: Function,
-  ): Object => {
-    try {
-      const save = JSON.stringify({
-        board,
-        moves,
-        score,
-      });
-
-      await AsyncStorage.setItem('save', save);
-
-      dispatch(app.init());
-
-      return {
-        saved: true,
-      }
-    } catch (error) {
-      return {
-        saved: false,
-        error,
-      }
+      stats,
     }
   }
 );
@@ -158,8 +124,25 @@ const tryMoveAction: Function = createAction(
 
 const gameOverAction: Function = createAction(
   ACTIONS.GAME_OVER,
-  (dispatch: Function): void => {
-    dispatch(app.playSound('gameover'));
+  async (dispatch: Function, state: Object): void => {
+    let { stats, score } = state().game;
+
+    if (score > stats.highscore) {
+      stats = { ...stats, ...{ highscore: score, newHighscore: true } };
+
+      dispatch(app.playSound('highscore'));
+    } else {
+
+      dispatch(app.playSound('gameover'));
+    }
+
+    stats = { ...stats, ...{
+      gamesPlayed: stats.gamesPlayed + 1
+    }};
+
+    await AsyncStorage.setItem('stats', JSON.stringify(stats));
+
+    return { stats };
   }
 );
 
@@ -183,24 +166,16 @@ const processHits: Function = (
   dispatch(processHitsAction(hits, board, score, dispatch));
 };
 
-const saveGame: Function = (
-  board: Array<Array<Object>>,
-  moves: number,
-  score: number,
-): Function => (dispatch: Function): void => {
-  dispatch(saveGameAction(board, moves, score, dispatch));
-  dispatch(gameLoading());
-};
-
 const startGame: Function = (
   resume: boolean,
-): Function => (dispatch: Function): void => {
-    dispatch(startGameAction(resume));
+): Function => (dispatch: Function, getState: Function): void => {
+    dispatch(startGameAction(resume, getState));
     dispatch(gameLoading());
 };
 
-const gameOver: Function = (): Function => (dispatch: Function): void => {
-  dispatch(gameOverAction(dispatch));
+const gameOver: Function = (): Function => (dispatch: Function, getState: Function): void => {
+  dispatch(app.removeSavedGame());
+  dispatch(gameOverAction(dispatch, getState));
 };
 
 export {
@@ -209,6 +184,5 @@ export {
   processHits,
   processBlanks,
   gameOver,
-  saveGame,
   toggleMenu,
 };
