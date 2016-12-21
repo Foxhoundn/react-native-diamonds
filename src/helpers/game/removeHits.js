@@ -1,13 +1,13 @@
 /* @flow */
-import { Vibration } from 'react-native';
+import { vibrate } from '../../store/app/actions';
 
-const removeHits: Function = (board: Array<Array<Object>>, hits: Array<Object>) => {
+const removeHits: Function = (board: Array<Array<Object>>, hits: Array<Object>, dispatch: Function) => {
   const newBoard = board.slice().reduce((brd, coll) => {
     const boardRow = coll.slice().reduce((rw, field) => {
       const match = hits.find(hit => hit.row === field.row && hit.field === field.field);
 
       if (match) {
-        Vibration.vibrate();
+        dispatch(vibrate());
 
         return [...rw, { ...field, ...{ color: 'transparent' } }];
       }

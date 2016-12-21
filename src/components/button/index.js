@@ -1,5 +1,9 @@
 /* @flow */
 import React from 'react';
+import withHandlers from 'recompose/withHandlers';
+import { connect } from 'react-redux';
+import compose from 'recompose/compose';
+import pure from 'recompose/onlyUpdateForKeys';
 import {
   TouchableHighlight,
   View,
@@ -9,20 +13,23 @@ import LinearGradient from 'react-native-linear-gradient';
 
 import styles from './style';
 import Text from '../text/';
+import { vibrate } from '../../store/app/actions';
 
 type Props = {
-  children: string,
+  children: number,
+  onButtonPress: Function,
   onPress: Function,
   disabled: boolean,
   wrapperStyle?: Object,
   textStyle?: Object,
   icon?: string,
   iconStyle: Object,
+  vibrate: Function,
 }
 
 const Button: Function = ({
   children,
-  onPress,
+  onButtonPress,
   disabled,
   wrapperStyle = {},
   textStyle = {},
@@ -30,7 +37,7 @@ const Button: Function = ({
   iconStyle = {},
 }: Props): React.Component<any> => (
   <TouchableHighlight
-    onPress={onPress}
+    onPress={onButtonPress}
     underlayColor="transparent"
   >
    <View
@@ -39,7 +46,7 @@ const Button: Function = ({
        wrapperStyle,
        disabled ? styles.buttonDisabled : {},
      ]}
-    >
+   >
     <LinearGradient
       colors={disabled ? ['#a9a9a9', '#696969'] : ['#8440b2', '#d326b6']}
       style={[
@@ -65,4 +72,21 @@ const Button: Function = ({
   </TouchableHighlight>
 );
 
-export default Button;
+export default compose(
+  connect(
+    () => ({}),
+    {
+      vibrate,
+    }
+  ),
+  withHandlers({
+    onButtonPress: (props: Props): Function => (): void => {
+      props.vibrate();
+      props.onPress();
+    },
+  }),
+  pure([
+    'children',
+    'disabled',
+  ])
+)(Button);

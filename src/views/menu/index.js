@@ -6,8 +6,10 @@ import Button from '../../containers/button';
 import View from '../../components/view';
 import GameView from '../../views/game';
 import SettingsView from '../../views/settings';
+import StatsView from '../../views/stats';
 import loader from '../../hocomponents/loader';
 import globalStyles from '../../style';
+import SelectionView from './selection';
 
 type Props = {
   onContinueClick: Function,
@@ -20,6 +22,7 @@ const Menu: Function= ({
   onContinueClick,
   onNewGameClick,
   onSettingsClick,
+  onStatsClick,
   save,
 }: Props): React.Component<any> => (
   <View>
@@ -35,7 +38,7 @@ const Menu: Function= ({
       textStyle={globalStyles.menuButtonText}
     > NEW GAME </Button>
     <Button
-      onPress={onNewGameClick}
+      onPress={onStatsClick}
       wrapperStyle={globalStyles.menuButton}
       textStyle={globalStyles.menuButtonText}
     > HIGHSCORE </Button>
@@ -60,13 +63,19 @@ export default compose(
     },
     onNewGameClick: (props: Object): Function => (): void => {
       props.navigator.push({
-        component: GameView,
+        component: SelectionView,
         navigationBarHidden: true,
       })
     },
     onSettingsClick: (props: Object): Function => (): void => {
       props.navigator.push({
         component: SettingsView,
+        navigationBarHidden: true,
+      })
+    },
+    onStatsClick: (props: Object): Function => (): void => {
+      props.navigator.push({
+        component: StatsView,
         navigationBarHidden: true,
       })
     },

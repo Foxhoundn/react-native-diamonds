@@ -1,10 +1,15 @@
 /* @flow */
 import React from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 
 import Overlay from '../../components/overlay';
+import Text from '../../components/text';
+import Section from '../../components/section';
 import Button from '../../containers/button';
 import globalStyles from '../../style';
+import styles from './style';
+import HighScore from './highscore';
 import showIfTrue from '../../hocomponents/showIfTrue';
 
 type Props = {
@@ -15,25 +20,61 @@ type Props = {
   onResumePress: Function,
   onNewGamePress: Function,
   onMenuPress: Function,
+  newHighscore: boolean,
+  gameType: string,
 }
 
 const GameMenu: Function = ({
   over,
   score,
+  newHighscore,
   stats,
   onResumePress,
   onNewGamePress,
   onMenuPress,
+  gameType,
 }: Props): React.Element<any> => (
   <Overlay>
     {over && (
       <View>
-        <Text style={{ fontSize: 28, color: '#fff', fontWeight: 'bold' }}>
+        <Text style={styles.overText}>
           GAME OVER
         </Text>
-        <Text style={{ fontSize: 28, color: '#fff', fontWeight: 'bold' }}>
-          HIGHSCORE: { stats.highscore }
-        </Text>
+        <HighScore isHighscore={newHighscore} />
+        <Section
+          customStyle={[
+            styles.scoreWrapper,
+            newHighscore ? styles.highScoreWrapper : null,
+          ]}
+        >
+          <LinearGradient
+            colors={
+              newHighscore ?
+              ['#19F86D', '#32B82C'] :
+              ['#a9a9a9', '#696969']
+            }
+            style={[
+              styles.scoreGradient,
+              newHighscore ? styles.highScoreGradient : null,
+              globalStyles.flexCenter,
+            ]}
+          >
+            <Text
+              style={[
+                styles.scoreText,
+              ]}
+            >
+              SCORE : { score }
+            </Text>
+            <Text
+              style={[
+                styles.scoreText,
+              ]}
+            >
+              BEST : { stats.highscore[gameType] }
+            </Text>
+          </LinearGradient>
+        </Section>
       </View>
     )}
     {!over && (

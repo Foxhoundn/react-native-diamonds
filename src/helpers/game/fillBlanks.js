@@ -4,7 +4,7 @@ import sample from 'lodash/sample';
 import getBlanks from './getBlanks';
 import { COLOURS } from '../../constants/game';
 
-const fillBlanks: Function = (board: Array<Array<Object>>): Array<*> => {
+const fillBlanks: Function = (board: Array<Array<Object>>, gameType: string): Array<*> => {
   let newBoard = [];
   let currentField;
 
@@ -18,7 +18,7 @@ const fillBlanks: Function = (board: Array<Array<Object>>): Array<*> => {
           newBoard[rowIndex].push({
             field: currentField.field,
             row: currentField.row,
-            color: sample(COLOURS),
+            color: sample(COLOURS[gameType]),
           });
         } else {
           const top = newBoard[rowIndex - 1].find(d => d.field === field);
@@ -46,7 +46,7 @@ const fillBlanks: Function = (board: Array<Array<Object>>): Array<*> => {
   });
 
   if (getBlanks(newBoard) !== 0) {
-    newBoard = fillBlanks(newBoard);
+    newBoard = fillBlanks(newBoard, gameType);
   }
 
   return newBoard;

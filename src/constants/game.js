@@ -7,20 +7,29 @@ const ACTIONS = {
   GAME_OVER: 'GAME_OVER',
   GAME_LOADING: 'GAME_SAVING',
   GAME_TOGGLEMENU: 'GAME_TOGGLEMENU',
+  GAME_RESETSTREAK: 'GAME_RESETSTREAK',
 };
 
-const COLOURS = [
-  'green',
-  'blue',
-  'red',
-  'yellow',
-  'purple',
-  'orange',
-];
+const COLOURS = {
+  classic: [
+    'light-green',
+    'yellow',
+    'orange',
+    'red',
+    'purple',
+    'pink',
+  ],
+  bestOfOne: [
+    'black',
+    'brown',
+    'blue',
+    'green',
+  ],
+};
 
 const DEFAULTS = {
-  score: 0,
-  moves: 3,
+  classic: 20,
+  bestOfOne: 1,
 };
 
 export {

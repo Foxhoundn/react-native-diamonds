@@ -5,7 +5,6 @@ const { width } = Dimensions.get('window');
 
 export default StyleSheet.create({
   buttonWrapper: {
-    flex: 1,
     borderWidth: 2,
     borderRadius: 5,
     borderColor: '#ede661',

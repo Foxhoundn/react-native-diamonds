@@ -1,6 +1,6 @@
 /* @flow */
 import { handleActions } from 'redux-actions';
-import { ACTIONS } from '../../constants/game';
+import { ACTIONS, DEFAULTS } from '../../constants/game';
 
 const initialState: Object = {
   processing: false,
@@ -14,20 +14,20 @@ const initialState: Object = {
   loading: false,
   menu: false,
   score: 0,
-  moves: 1,
-  stats: {
-    highscore: 0,
-    gamesPlayed: 0,
-  },
+  moves: null,
+  streak: 0,
+  bestStreak: 0,
+  newHighscore: false,
+  gameType: null,
 };
 
 export default handleActions({
-  [ACTIONS.GAME_STARTGAME]: (state: Object, { payload: { board, score, moves, stats } }) => (
+  [ACTIONS.GAME_STARTGAME]: (state: Object, { payload: { board, score, moves, gameType } }) => (
     { ...initialState, ...{
       board,
       score: score || initialState.score,
-      moves: moves || initialState.moves,
-      stats: stats || initialState.stats,
+      moves: moves || DEFAULTS[gameType],
+      gameType,
     }}
   ),
   [ACTIONS.GAME_LOADING]: (state: Object) => {
@@ -64,18 +64,24 @@ export default handleActions({
       }};
     }
 
-    return { ...state, ...{ processing: false, target: null } };
+    return { ...state, ...{ processing: false, target: null, streak: 0 } };
   },
-  [ACTIONS.GAME_PROCESSHITS]: (state: Object, { payload: { board, score, blanks }}) => (
-    { ...state, ...{ board, score, blanks, hits: null } }
-  ),
+  [ACTIONS.GAME_PROCESSHITS]: (state: Object, { payload: { board, score, blanks }}) => {
+    const streak = state.streak + 1;
+    const bestStreak = streak > state.bestStreak ? streak : state.bestStreak;
+
+    return { ...state, ...{ board, score, blanks, hits: null, streak, bestStreak } };
+  },
   [ACTIONS.GAME_PROCESSBLANKS]: (state: Object, { payload: { board, hits, blanks, processing } }) => (
     { ...state, ...{ board, hits, processing, blanks } }
   ),
-  [ACTIONS.GAME_TOGGLEMENU]: (state: Object) => (
+  [ACTIONS.GAME_TOGGLEMENU]: (state: Object): Object => (
     { ...state, ...{ menu: !state.menu } }
   ),
-  [ACTIONS.GAME_OVER]: (state: Object, { payload: { stats } }) => (
-    { ...state, ...{ processing: true, over: true, stats } }
+  [ACTIONS.GAME_RESETSTREAK]: (state: Object): Object => (
+    { ...state, ...{ streak: 0 } }
+  ),
+  [ACTIONS.GAME_OVER]: (state: Object, { payload: { newHighscore } }) => (
+    { ...state, ...{ processing: true, over: true, newHighscore } }
   ),
 }, initialState);

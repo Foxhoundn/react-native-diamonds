@@ -7,8 +7,8 @@
   },
   "dependencies": {
     "lodash": "^4.15.0",
-    "react": "15.3.1",
-    "react-native": "0.33.0",
+    "react": "^15.4.1",
+    "react-native": "^0.39.2",
     "react-native-animatable": "^0.6.1",
     "react-native-linear-gradient": "^1.5.13",
     "react-native-sound": "^0.8.3",
@@ -20,5 +20,8 @@
     "redux-promise": "^0.5.3",
     "redux-thunk": "^2.1.0",
     "reselect": "^2.5.3"
+  },
+  "devDependencies": {
+    "remote-redux-devtools": "^0.5.0"
   }
 }

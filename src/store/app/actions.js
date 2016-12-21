@@ -1,5 +1,5 @@
 import { createAction } from 'redux-actions';
-import { AsyncStorage } from 'react-native';
+import { AsyncStorage, Vibration } from 'react-native';
 import Sound from 'react-native-sound'
 
 import { ACTIONS, SOUNDS } from '../../constants/app';
@@ -7,10 +7,12 @@ import { ACTIONS, SOUNDS } from '../../constants/app';
 const initAction = createAction(
   ACTIONS.APP_INIT,
   async (): Object => {
+    // await AsyncStorage.removeItem('stats')
     const save = JSON.parse(await AsyncStorage.getItem('save'));
     const settings = JSON.parse(await AsyncStorage.getItem('settings'));
+    const stats = JSON.parse(await AsyncStorage.getItem('stats'));
 
-    return { save, settings };
+    return { save, settings, stats };
   }
 );
 
@@ -30,10 +32,23 @@ const playSoundAction: Function = createAction(
     const item = sounds.find((s: Object): boolean => s.name === name);
 
     if ((sound.type === 'sfx' && settings.sfx) || (sound.type === 'music' && settings.music)) {
-      item.play();
+      item.getCurrentTime((seconds: number, isPlaying: boolean) => {
+        if (!isPlaying) item.play();
+      });
     }
   }
 );
+
+const vibrateAction: Function = createAction(
+  ACTIONS.APP_VIBRATE,
+  (state: Function): void => {
+    const { app: { settings } } = state();
+
+    if (settings.vibrations) {
+      Vibration.vibrate();
+    }
+  }
+)
 
 const stopMusicAction: Function = createAction(
   ACTIONS.APP_STOPMUSIC,
@@ -52,8 +67,9 @@ const saveGameAction: Function = createAction(
     board: Array<Array<string>>,
     moves: number,
     score: number,
+    gameType: string,
   ): Object => {
-    const save = { board, moves, score };
+    const save = { board, moves, score, gameType };
 
     await AsyncStorage.setItem('save', JSON.stringify(save));
 
@@ -108,13 +124,17 @@ const playSound: Function = (sound: string): Function => (dispatch: Function, ge
   dispatch(playSoundAction(sound, getState));
 };
 
+const vibrate: Function = (): Function => (dispatch: Function, getState: Function): void => {
+  dispatch(vibrateAction(getState));
+};
+
 const saveGame: Function = (
   board: Array<Array<Object>>,
   moves: number,
   score: number,
-  navigator: Object,
+  gameType: string,
 ): Function => (dispatch: Function): void => {
-  dispatch(saveGameAction(board, moves, score, dispatch));
+  dispatch(saveGameAction(board, moves, score, gameType));
   dispatch(gameSaving());
 };
 
@@ -135,4 +155,5 @@ export {
   changeSettings,
   saveGame,
   removeSavedGame,
+  vibrate,
 }

@@ -12,7 +12,9 @@ import globalStyles from '../../style';
 
 type Props = {
   active: boolean,
-  field: Object,
+  position: number,
+  row: number,
+  color: string,
   onPress: Function,
 }
 
@@ -20,13 +22,13 @@ class Field extends Component {
   props: Props;
 
   state: {
-    opacity: number,
+    opacity: AnimatedValue | AnimatedValueXY,
   } = {
     opacity: new Animated.Value(1),
   };
 
-  componentWillReceiveProps(nextProps): void {
-    if (nextProps.field.color === 'transparent') {
+  componentWillReceiveProps(nextProps: Props): void {
+    if (nextProps.color === 'transparent') {
       Animated.timing(
         this.state.opacity,
         {
@@ -46,7 +48,7 @@ class Field extends Component {
   }
 
   render() {
-    const { onPress, active, field } = this.props;
+    const { onPress, active, color } = this.props;
 
     return (
       <TouchableWithoutFeedback onPress={onPress}>
@@ -86,7 +88,7 @@ class Field extends Component {
                   ],
                 },
               ]}
-              source={{ uri: field.color }}
+              source={{ uri: color }}
             />
           </LinearGradient>
         </View>

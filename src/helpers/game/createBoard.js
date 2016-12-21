@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { COLOURS } from '../../constants/game'
+import { COLOURS, COLOURSBOO } from '../../constants/game'
 
 const rows = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 const colors = COLOURS;
@@ -90,11 +90,13 @@ const clrSelector = (color, cls, count, row, field, sofar) => {
   }
 };
 
-const getColor = (r, field, sofar) => {
+const getColor = (r, field, sofar, gameType) => {
+  const colorsArr = colors[gameType];
+
   if (r === 1 && (field === 1 || field === 2)) {
-    return _.sample(colors);
+    return _.sample(colorsArr);
   } else {
-    let clrs = colors.slice();
+    let clrs = colorsArr.slice();
     let color = _.sample(clrs);
     let count = check(color, r, field, 1, sofar);
     const clr = clrSelector(color, clrs, count, r, field, sofar);
@@ -103,7 +105,7 @@ const getColor = (r, field, sofar) => {
 };
 
 
-const createBoard = () => {
+const createBoard = (gameType) => {
   let mapped = rows.map(row => {
     const r = [];
 
@@ -122,7 +124,7 @@ const createBoard = () => {
   return mapped.map(row => {
     const r = row.reduce((n, field) => {
       const nA = n.slice();
-      const color = getColor(field.row, field.field, newMap);
+      const color = getColor(field.row, field.field, newMap, gameType);
 
       nA.push(Object.assign({}, field, {color}));
       newMap.push(Object.assign({}, field, {color}));

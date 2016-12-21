@@ -39,7 +39,7 @@ const App: Function = ({
 export default compose(
   connect(
     ({ app }): Object => ({
-      loading: app.loadingSaves || app.loadingSounds,
+      loading: app.loadingSaves || app.loadingSounds || app.loadingStats,
       loadingSounds: app.loadingSounds,
       save: app.save,
       musicOn: app.settings.music,

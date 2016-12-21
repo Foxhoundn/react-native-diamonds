@@ -2,10 +2,14 @@
 import React, { Component } from 'react';
 import wrapDisplayName from 'recompose/wrapDisplayName';
 
-export default (): Function => (Comp: React.Element<any>): React.Element<any> => {
+export default (top: boolean): Function => (Comp: React.Element<any>): React.Element<any> => {
   class WrappedComponent extends Component {
     handleGoBack: Function = () => {
-      this.props.navigator.pop();
+      if (top) {
+        this.props.navigator.popToTop();
+      } else {
+        this.props.navigator.pop();
+      }
     };
 
     render() {

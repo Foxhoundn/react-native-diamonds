@@ -1,9 +1,10 @@
-/* @flow */
+// @flow
 import React from 'react';
 import { View } from 'react-native';
 import compose from 'recompose/compose';
 import lifecycle from 'recompose/lifecycle';
 import withHandlers from 'recompose/withHandlers';
+import mapProps from 'recompose/mapProps';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 
@@ -14,7 +15,9 @@ import GameBoard from './gameBoard';
 import GameMenu from './gameMenu';
 import Moves from './movesCounter';
 import Score from './score';
+import Streak from './streak';
 import TopBar from '../../components/topbar';
+import Text from '../../components/text';
 import Section from '../../components/section';
 import CustomView from '../../components/view';
 import Button from '../../containers/button';
@@ -30,9 +33,16 @@ type Props = {
   selectField: Function,
   menu: boolean,
   toggleMenu: Function,
-  startGame: Function,
+  onNewGamePress: Function,
   over: boolean,
   stats: Object,
+  onMenuPress: Function,
+  onPausePress: Function,
+  startGame: Function,
+  streak: number,
+  newHighscore: boolean,
+  gameType: string,
+  type: string,
 }
 
 const GameView: Function = ({
@@ -40,6 +50,7 @@ const GameView: Function = ({
   score,
   onMenuPress,
   onPausePress,
+  onNewGamePress,
   toggleMenu,
   startGame,
   moves,
@@ -49,6 +60,9 @@ const GameView: Function = ({
   menu,
   over,
   stats,
+  streak,
+  newHighscore,
+  gameType,
 }: Props): React.Element<any> => (
   <CustomView
     style={globalStyles.flex}
@@ -74,21 +88,24 @@ const GameView: Function = ({
             disabled={processing}
           />
         </Section>
-        <Score score={score} />
+        <Score score={score} streak={streak} />
       </TopBar>
       <GameBoard
         board={board}
         selected={selected}
         selectField={selectField}
       />
+      <Streak streak={streak} />
       <GameMenu
         show={over || menu}
         over={over}
+        newHighscore={newHighscore}
         score={score}
         stats={stats}
         onResumePress={toggleMenu}
-        onNewGamePress={startGame}
+        onNewGamePress={onNewGamePress}
         onMenuPress={onMenuPress}
+        gameType={gameType}
       />
     </View>
   </CustomView>
@@ -96,9 +113,11 @@ const GameView: Function = ({
 
 
 const gameSelector: Function = (state: Object): Object => state.game;
+const appSelector: Function = (state: Object): Object => state.app;
 const viewSelector: Function = createSelector(
   [
     gameSelector,
+    appSelector,
   ], (game: Object, app: Object) => ({
     board: game.board,
     processing: game.processing,
@@ -110,7 +129,10 @@ const viewSelector: Function = createSelector(
     moves: game.moves,
     loading: game.loading,
     menu: game.menu,
-    stats: game.stats,
+    stats: app.stats,
+    streak: game.streak,
+    newHighscore: game.newHighscore,
+    gameType: game.gameType,
   })
 );
 
@@ -122,30 +144,36 @@ export default compose(
       selectField: actions.selectField,
       processHits: actions.processHits,
       processBlanks: actions.processBlanks,
-      resumeGame: actions.resumeGame,
       gameOver: actions.gameOver,
       saveGame,
       toggleMenu: actions.toggleMenu,
+      resetStreak: actions.resetStreak,
     }
   ),
+  mapProps(({ type, gameType, ...rest }: Props) => ({
+    gameType: type || gameType,
+    ...rest,
+  })),
   lifecycle({
     componentWillMount() {
-      const { startGame, resume } = this.props;
+      const { startGame, resume, gameType } = this.props;
 
-      startGame(resume);
+      startGame(resume, gameType);
     },
     componentWillReceiveProps(nextProps) {
-      const { processHits, processBlanks, gameOver } = this.props;
-      const { board, score, hits, blanks, processing, moves, over } = nextProps;
+      const { processHits, processBlanks, gameOver, resetStreak } = this.props;
+      const { board, score, hits, blanks, processing, moves, over, streak, gameType } = nextProps;
 
       if (hits) {
-        processHits(hits, board, score);
+        processHits(hits, board, streak, score);
       } else if (blanks) {
-        processBlanks(board);
+        processBlanks(board, gameType);
+      } else {
+        resetStreak();
       }
 
       if (moves === 0 && !processing && !over) {
-        gameOver(score);
+        gameOver(gameType);
       }
     }
   }),
@@ -157,10 +185,13 @@ export default compose(
     },
     onMenuPress: (props: Object): Function => (): void => {
       if (!props.over) {
-        props.saveGame(props.board, props.moves, props.score);
+        props.saveGame(props.board, props.moves, props.score, props.gameType);
       }
 
-      props.navigator.pop();
+      props.navigator.popToTop();
+    },
+    onNewGamePress: ({ startGame, gameType }: Props): Function => (): void => {
+      startGame(false, gameType);
     },
   }),
   loader('loading')

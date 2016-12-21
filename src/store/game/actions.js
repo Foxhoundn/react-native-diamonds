@@ -15,17 +15,12 @@ import * as app from '../app/actions';
 
 const startGameAction: Function = createAction(
   ACTIONS.GAME_STARTGAME,
-  async (resume: boolean, state: Object): Object => {
-    const stats = JSON.parse(await AsyncStorage.getItem('stats'));
-
+  async (resume: boolean, gameType: string, state: Function): Object => {
     if (resume) {
-      return { ...state().app.save, ...{ stats } };
+      return { ...state().app.save };
     }
 
-    return {
-      board: createBoard(),
-      stats,
-    }
+    return { board: createBoard(gameType), gameType };
   }
 );
 
@@ -36,9 +31,7 @@ const gameLoading: Function = createAction(
 const selectFieldAction: Function = createAction(
   ACTIONS.GAME_SELECTFIELD,
   (field: Object, selected: Object, dispatch: Function): Object => {
-    if (!selected) {
-      dispatch(app.playSound('select'));
-    }
+    if (!selected) dispatch(app.playSound('select'));
 
     return { field }
   }
@@ -49,14 +42,15 @@ const processHitsAction: Function = createAction(
   async (
     hits: Array<Object>,
     board: Array<Array<Object>>,
+    streak: number,
     score: number,
     dispatch: Function
   ) => (
     await new Promise(resolve => {
       setTimeout(() => {
-        const newBoard = removeHits(board, hits);
+        const newBoard = removeHits(board, hits, dispatch);
         const blanks = getBlanks(newBoard);
-        const newScore = calculateScore(score, hits);
+        const newScore = calculateScore(score, hits, streak);
 
         dispatch(app.playSound('bubble'));
         dispatch(app.playSound('score'));
@@ -66,7 +60,7 @@ const processHitsAction: Function = createAction(
           score: newScore,
           blanks,
         });
-      }, 300)
+      }, 350)
     })
   )
 );
@@ -75,19 +69,20 @@ const processBlanks: Function = createAction(
   ACTIONS.GAME_PROCESSBLANKS,
   async (
     board: Array<Array<Object>>,
+    gameType: string,
   ) => (
     await new Promise(resolve => {
       setTimeout(() => {
-        const newBoard = fillBlanks(board);
+        const newBoard = fillBlanks(board, gameType);
         const hits = checkForHits(newBoard);
-        const processing = hits ? true : false;
+        const processing = !!hits;
 
         resolve({
           board: newBoard,
           hits,
           processing,
         });
-      }, 600)
+      }, 650)
     })
   )
 );
@@ -101,7 +96,7 @@ const tryMoveAction: Function = createAction(
     if (neighbour) {
       const newBoard = moveFields(board, selected, target);
       const hits = checkForHits(newBoard);
-      const processing = hits ? true : false;
+      const processing = !!hits;
 
       if (hits) {
         dispatch(app.playSound('selectTarget'));
@@ -124,31 +119,39 @@ const tryMoveAction: Function = createAction(
 
 const gameOverAction: Function = createAction(
   ACTIONS.GAME_OVER,
-  async (dispatch: Function, state: Object): void => {
-    let { stats, score } = state().game;
+  async (type: string, dispatch: Function, state: Function): Object => {
+    const { score, bestStreak } = state().game;
+    let { stats } = state().app;
+    let newHighscore;
 
-    if (score > stats.highscore) {
-      stats = { ...stats, ...{ highscore: score, newHighscore: true } };
+    if (score > stats.highscore[type]) {
+      const highscore = { ...stats.highscore, ...{ [type]: score } };
+      stats = { ...stats, ...{ highscore } };
+      newHighscore = true;
 
       dispatch(app.playSound('highscore'));
     } else {
+      newHighscore = false;
 
       dispatch(app.playSound('gameover'));
     }
 
+    if (bestStreak > stats.streak) {
+      stats = { ...stats, ...{ streak: bestStreak } };
+    }
+
     stats = { ...stats, ...{
-      gamesPlayed: stats.gamesPlayed + 1
+      gamesPlayed: stats.gamesPlayed + 1,
     }};
 
     await AsyncStorage.setItem('stats', JSON.stringify(stats));
 
-    return { stats };
+    return { stats, newHighscore };
   }
 );
 
-const toggleMenu: Function = createAction(
-  ACTIONS.GAME_TOGGLEMENU
-);
+const toggleMenu: Function = createAction(ACTIONS.GAME_TOGGLEMENU);
+const resetStreak: Object = createAction(ACTIONS.GAME_RESETSTREAK);
 
 const selectField = (field: Object): Function => (dispatch: Function, getState: Function): void => {
   dispatch(selectFieldAction(field, getState().game.selected, dispatch));
@@ -161,21 +164,23 @@ const selectField = (field: Object): Function => (dispatch: Function, getState: 
 const processHits: Function = (
   hits: Array<Object>,
   board: Array<Array<Object>>,
+  streak: number,
   score: number
 ): Function => (dispatch: Function): void => {
-  dispatch(processHitsAction(hits, board, score, dispatch));
+  dispatch(processHitsAction(hits, board, streak, score, dispatch));
 };
 
 const startGame: Function = (
   resume: boolean,
+  gameType: string,
 ): Function => (dispatch: Function, getState: Function): void => {
-    dispatch(startGameAction(resume, getState));
-    dispatch(gameLoading());
+  dispatch(startGameAction(resume, gameType, getState));
+  dispatch(gameLoading());
 };
 
-const gameOver: Function = (): Function => (dispatch: Function, getState: Function): void => {
+const gameOver: Function = (type: string): Function => (dispatch: Function, getState: Function): void => {
   dispatch(app.removeSavedGame());
-  dispatch(gameOverAction(dispatch, getState));
+  dispatch(gameOverAction(type, dispatch, getState));
 };
 
 export {
@@ -185,4 +190,5 @@ export {
   processBlanks,
   gameOver,
   toggleMenu,
+  resetStreak,
 };
